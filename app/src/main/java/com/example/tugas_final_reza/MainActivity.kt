@@ -3,11 +3,7 @@
 package com.example.tugas_final_reza
 
 import android.Manifest
-import android.app.Activity
-import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
@@ -17,12 +13,9 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.tugas_final_reza.User.Adapter
 import com.example.tugas_final_reza.User.MahasiswaEntity
 import com.example.tugas_final_reza.User.UserViewModel
 import com.karumi.dexter.Dexter
