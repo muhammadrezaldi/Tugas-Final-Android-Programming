@@ -2,8 +2,12 @@
 
 package com.example.tugas_final_reza
 
+import android.Manifest
+import android.app.Activity
+import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
@@ -12,12 +16,23 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.tugas_final_reza.User.Adapter
 import com.example.tugas_final_reza.User.MahasiswaEntity
 import com.example.tugas_final_reza.User.UserViewModel
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.MultiplePermissionsReport
+import com.karumi.dexter.PermissionToken
+import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.dialog_layout.view.*
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -33,14 +48,14 @@ class MainActivity : AppCompatActivity() {
 
         recyclerview.setHasFixedSize(true)
         recyclerview.layoutManager = LinearLayoutManager(this)
-
+        checkPermission()
         addbtn.setOnClickListener {
             addButtonAction()
         }
-
     }
 
     private fun addButtonAction() {
+        imgurl = ""
         val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_layout, null)
         val builder = this.let {
             AlertDialog.Builder(it)
@@ -100,6 +115,28 @@ class MainActivity : AppCompatActivity() {
             Log.d("img url", url)
             pasfoto.setImageURI(imageUri)
         }
+    }
+
+
+    private fun checkPermission() {
+        Dexter
+            .withActivity(this)
+            .withPermissions(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+            .withListener(object : MultiplePermissionsListener {
+                override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
+                    viewModel.getMahasiswas()?.observe(this@MainActivity, Observer {
+                        recyclerview.adapter = Adapter(it)
+                    })
+                }
+
+                override fun onPermissionRationaleShouldBeShown(permissions: MutableList<PermissionRequest>?, token: PermissionToken?) {
+                    token?.continuePermissionRequest()
+                }
+            })
+            .check()
     }
 
 }

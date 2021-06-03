@@ -16,12 +16,13 @@
             android:id="@+id/card"
             android:layout_width="100dp"
             android:layout_height="110dp"
+            app:cardCornerRadius="10dp"
             android:layout_margin="12dp">
             <ImageView
                 android:id="@+id/pasfoto"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#ECECEC"
+                android:scaleType="fitXY"
                 android:src="@drawable/ic_man"/>
         </androidx.cardview.widget.CardView>
 

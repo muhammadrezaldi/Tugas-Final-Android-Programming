@@ -14,7 +14,7 @@ class Adapter(private val list: List<MahasiswaEntity>): RecyclerView.Adapter<Ada
     inner class Holder(itemView: View): RecyclerView.ViewHolder(itemView) {
         fun bind(mahasiswaEntity: MahasiswaEntity) {
             with(itemView) {
-                if(mahasiswaEntity.urlPasFoto != null) {
+                if(mahasiswaEntity.urlPasFoto != "") {
                     try {
                         pasfoto.setImageURI(Uri.parse(mahasiswaEntity.urlPasFoto))
                     } catch (e: Exception){}
