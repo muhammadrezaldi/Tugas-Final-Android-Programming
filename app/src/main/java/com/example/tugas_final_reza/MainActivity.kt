@@ -4,6 +4,7 @@ package com.example.tugas_final_reza
 
 import android.Manifest
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
@@ -25,6 +26,8 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.dialog_layout.view.*
+import kotlinx.android.synthetic.main.dialog_layout.view.pasfoto
+import kotlinx.android.synthetic.main.item_mahasiswa.view.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -110,7 +113,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
     private fun checkPermission() {
         Dexter
             .withActivity(this)
@@ -121,7 +123,11 @@ class MainActivity : AppCompatActivity() {
             .withListener(object : MultiplePermissionsListener {
                 override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
                     viewModel.getMahasiswas()?.observe(this@MainActivity, Observer {
-                        recyclerview.adapter = Adapter(it)
+                        recyclerview.adapter = Adapter(it, object : Adapter.Listener {
+                            override fun onClick(mahasiswaEntity: MahasiswaEntity) {
+                                tampilkanDialog(mahasiswaEntity)
+                            }
+                        })
                     })
                 }
 
@@ -130,6 +136,88 @@ class MainActivity : AppCompatActivity() {
                 }
             })
             .check()
+    }
+
+    private fun tampilkanDialog(mahasiswaEntity: MahasiswaEntity) {
+        imgurl = mahasiswaEntity.urlPasFoto!!
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_layout, null)
+        val builder = this.let {
+            AlertDialog.Builder(it)
+                .setView(dialogView)
+        }
+        val mDialog = builder?.show()
+
+        //SET VALUE
+        pasfoto = dialogView.pasfoto
+
+        if(mahasiswaEntity.urlPasFoto != "") {
+            try {
+                pasfoto.setImageURI(Uri.parse(mahasiswaEntity.urlPasFoto))
+            } catch (e: java.lang.Exception){}
+        } else {
+            if(mahasiswaEntity.jenisKelamin == "Laki-laki") {
+                pasfoto.setImageResource(R.drawable.ic_man)
+            } else {
+                pasfoto.setImageResource(R.drawable.ic_woman)
+            }
+        }
+
+        with(dialogView) {
+            hapus.visibility = View.VISIBLE
+            namaET.setText(mahasiswaEntity.nama)
+            nimET.setText(mahasiswaEntity.nim)
+            angkatanET.setText(""+mahasiswaEntity.angkatan)
+            umurET.setText(""+mahasiswaEntity.umur)
+            when(mahasiswaEntity.jenisKelamin) {
+                "Laki-laki"-> dialogView.lakilaki.isChecked = true
+                else -> dialogView.perempuan.isChecked = true
+            }
+            sukuET.setText(mahasiswaEntity.suku)
+            agamaET.setText(mahasiswaEntity.agama)
+            tempatlahirET.setText(mahasiswaEntity.tempatLahir)
+            tanggallahirET.setText(mahasiswaEntity.tanggalLahir)
+        }
+
+        dialogView.close_btn.setOnClickListener {
+            mDialog?.dismiss()
+        }
+
+        dialogView.pasfoto.setOnClickListener {
+            val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
+            startActivityForResult(gallery, pickImage)
+        }
+
+        dialogView.btn.text = "Update"
+        dialogView.btn.setOnClickListener {
+            try {
+                with(dialogView) {
+                    viewModel.updateMahasiswa(
+                        MahasiswaEntity(
+                            mahasiswaEntity.id,
+                            imgurl,
+                            namaET.text.toString(),
+                            nimET.text.toString(),
+                            angkatanET.text.toString().toInt(),
+                            umurET.text.toString().toInt(),
+                            jeniskelamin(this),
+                            sukuET.text.toString(),
+                            agamaET.text.toString(),
+                            tempatlahirET.text.toString(),
+                            tanggallahirET.text.toString()
+                        )
+                    )
+                }
+                mDialog?.dismiss()
+                Toast.makeText(this,"Data berhasil disimpan", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception){
+                Log.e("MainActivity", "Error : $e")
+            }
+        }
+        dialogView.hapus.setOnClickListener {
+            viewModel.deleteMahasiswa(mahasiswaEntity)
+            Toast.makeText(this,"Data berhasil dihapus", Toast.LENGTH_SHORT).show()
+            mDialog?.dismiss()
+        }
     }
 
 }

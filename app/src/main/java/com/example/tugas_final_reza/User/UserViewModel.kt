@@ -21,7 +21,7 @@ class UserViewModel(application: Application): AndroidViewModel(application) {
         repository.delete(mahasiswa)
     }
 
-    fun updateNote(mahasiswa: MahasiswaEntity) {
+    fun updateMahasiswa(mahasiswa: MahasiswaEntity) {
         repository.update(mahasiswa)
     }
 

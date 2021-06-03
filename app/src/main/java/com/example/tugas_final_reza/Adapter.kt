@@ -14,7 +14,7 @@ class Adapter(private val list: List<MahasiswaEntity>, private val listener: Lis
     interface Listener {
         fun onClick(mahasiswaEntity: MahasiswaEntity)
     }
-    
+
     inner class Holder(itemView: View): RecyclerView.ViewHolder(itemView) {
         fun bind(mahasiswaEntity: MahasiswaEntity, listener: Listener) {
             with(itemView) {
